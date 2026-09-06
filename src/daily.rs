@@ -74,7 +74,13 @@ fn daily_next(session: &SimpleSession) -> Option<Command> {
         }
     }
 
-    let max_daily_spins = crate::constant::WHEEL_MAX_DAILY_SPINS;
+    let is_lucky_day = gs.specials.events.active.contains(&Event::LuckyDay);
+
+    let max_daily_spins = if is_lucky_day {
+        crate::constant::WHEEL_MAX_DAILY_SPINS_LUCKY_DAY_EVENT
+    } else {
+        crate::constant::WHEEL_MAX_DAILY_SPINS
+    };
 
     if gs.specials.wheel.lucky_coins >= 10 && gs.specials.wheel.spins_today < max_daily_spins {
         return Some(Command::SpinWheelOfFortune { payment: FortunePayment::LuckyCoins });
