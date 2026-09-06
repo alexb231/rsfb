@@ -39,3 +39,6 @@ pub const MIN_MUSHROOM_RESERVE: u32 = 30;
 /// Maximum proportion of total mushrooms allowed for a single guild upgrade.
 /// The mushroom price must be strictly less than this ratio (e.g. 0.10 for 10%).
 pub const GUILD_UPGRADE_MAX_MUSHROOM_RATIO: f64 = 0.10;
+
+/// Maximum number of total spins allowed per day on the Wheel of Fortune (Dr. Abawuwu).
+pub const WHEEL_MAX_DAILY_SPINS: u8 = 20;

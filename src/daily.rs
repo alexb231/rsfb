@@ -17,6 +17,10 @@ fn daily_next(session: &SimpleSession) -> Option<Command> {
         return None;
     };
 
+    if gs.character.inventory.count_free_slots() < crate::constant::INVENTORY_MIN_FREE_SLOTS {
+        return None;
+    }
+
     let now = chrono::Local::now();
 
     if let Some(next) = gs.specials.calendar.next_possible {
@@ -65,9 +69,15 @@ fn daily_next(session: &SimpleSession) -> Option<Command> {
     }
 
     if let Some(next) = gs.specials.wheel.next_free_spin {
-        if now >= next {
+        if now >= next && gs.specials.wheel.spins_today < crate::constant::WHEEL_MAX_DAILY_SPINS {
             return Some(Command::SpinWheelOfFortune { payment: FortunePayment::FreeTurn });
         }
+    }
+
+    let max_daily_spins = crate::constant::WHEEL_MAX_DAILY_SPINS;
+
+    if gs.specials.wheel.lucky_coins >= 10 && gs.specials.wheel.spins_today < max_daily_spins {
+        return Some(Command::SpinWheelOfFortune { payment: FortunePayment::LuckyCoins });
     }
 
     None
@@ -94,6 +104,10 @@ pub async fn daily(session: &mut SimpleSession) {
 
             Command::SpinWheelOfFortune { payment: FortunePayment::FreeTurn } => {
                 log(session, "SPINNING WHEEL OF FORTUNE (FREE SPIN)");
+            }
+
+            Command::SpinWheelOfFortune { payment: FortunePayment::LuckyCoins } => {
+                log(session, "SPINNING WHEEL OF FORTUNE (LUCKY COINS)");
             }
 
             Command::ClaimableClaim { msg_id } => {
